@@ -36,15 +36,20 @@ func runTestCCUpgrade(t *testing.T, upgradeHeight abi.ChainEpoch) {
 	ctx := context.Background()
 	blockTime := 5 * time.Millisecond
 
+	// add an actor holding lots of FIL as a way to stabilise the dealmaking CE
+	// parameters that take circulating supply into account.
+	money := big.Mul(big.NewInt(1_000_000_000), big.NewInt(int64(build.FilecoinPrecision)))
 	bank, err := wallet.GenerateKey(types.KTSecp256k1)
 	require.NoError(t, err)
 
-	money := big.Mul(big.NewInt(100_000_000), big.NewInt(int64(build.FilecoinPrecision)))
 	client, miner, ens := kit.EnsembleMinimal(t, kit.MockProofs(),
 		kit.Account(bank, money),
 		kit.ConstructorOpts(kit.LatestActorsAt(upgradeHeight)),
 	)
 	ens.InterconnectAll().BeginMining(blockTime)
+
+	time.Sleep(30 * time.Second)
+	fmt.Println(client.StateNetworkVersion(ctx, types.EmptyTSK))
 
 	maddr, err := miner.ActorAddress(ctx)
 	if err != nil {
