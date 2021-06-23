@@ -7,7 +7,10 @@ import (
 	"time"
 
 	"github.com/filecoin-project/go-state-types/abi"
+	"github.com/filecoin-project/go-state-types/big"
+	"github.com/filecoin-project/lotus/build"
 	"github.com/filecoin-project/lotus/chain/types"
+	"github.com/filecoin-project/lotus/chain/wallet"
 	"github.com/filecoin-project/lotus/itests/kit"
 
 	"github.com/stretchr/testify/require"
@@ -33,8 +36,14 @@ func runTestCCUpgrade(t *testing.T, upgradeHeight abi.ChainEpoch) {
 	ctx := context.Background()
 	blockTime := 5 * time.Millisecond
 
-	opts := kit.ConstructorOpts(kit.LatestActorsAt(upgradeHeight))
-	client, miner, ens := kit.EnsembleMinimal(t, kit.MockProofs(), opts)
+	bank, err := wallet.GenerateKey(types.KTSecp256k1)
+	require.NoError(t, err)
+
+	money := big.Mul(big.NewInt(100_000_000), big.NewInt(int64(build.FilecoinPrecision)))
+	client, miner, ens := kit.EnsembleMinimal(t, kit.MockProofs(),
+		kit.Account(bank, money),
+		kit.ConstructorOpts(kit.LatestActorsAt(upgradeHeight)),
+	)
 	ens.InterconnectAll().BeginMining(blockTime)
 
 	maddr, err := miner.ActorAddress(ctx)
