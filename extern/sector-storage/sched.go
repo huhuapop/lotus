@@ -49,6 +49,8 @@ type WorkerSelector interface {
 	Ok(ctx context.Context, task sealtasks.TaskType, spt abi.RegisteredSealProof, a *workerHandle) (bool, error) // true if worker is acceptable for performing a task
 
 	Cmp(ctx context.Context, task sealtasks.TaskType, a, b *workerHandle) (bool, error) // true if a is preferred over b
+
+	FindDataWoker(ctx context.Context, task sealtasks.TaskType, sid abi.SectorID, spt abi.RegisteredSealProof, a *workerHandle) bool
 }
 
 type scheduler struct {
@@ -379,6 +381,7 @@ func (sh *scheduler) trySched() {
 			needRes := ResourceTable[task.taskType][task.sector.ProofType]
 
 			task.indexHeap = sqi
+			localWorker := false
 			for wnd, windowRequest := range sh.openWindows {
 				worker, ok := sh.workers[windowRequest.worker]
 				if !ok {
@@ -390,6 +393,12 @@ func (sh *scheduler) trySched() {
 				if !worker.enabled {
 					log.Debugw("skipping disabled worker", "worker", windowRequest.worker)
 					continue
+				}
+
+				if task.taskType == sealtasks.TTPreCommit1 || task.taskType == sealtasks.TTPreCommit2 || task.taskType == sealtasks.TTCommit1 {
+					if isExist := task.sel.FindDataWoker(task.ctx, task.taskType, task.sector.ID, task.sector.ProofType, worker); !isExist {
+						continue
+					}
 				}
 
 				// TODO: allow bigger windows
@@ -409,6 +418,11 @@ func (sh *scheduler) trySched() {
 					continue
 				}
 
+				if isExist := task.sel.FindDataWoker(task.ctx, task.taskType, task.sector.ID, task.sector.ProofType, worker); isExist {
+					localWorker = true
+					break
+				}
+
 				acceptableWindows[sqi] = append(acceptableWindows[sqi], wnd)
 			}
 
@@ -426,6 +440,11 @@ func (sh *scheduler) trySched() {
 
 				if wii == wji {
 					// for the same worker prefer older windows
+					return acceptableWindows[sqi][i] < acceptableWindows[sqi][j] // nolint:scopelint
+				}
+
+				if localWorker {
+					log.Debugw("prefer same worker")
 					return acceptableWindows[sqi][i] < acceptableWindows[sqi][j] // nolint:scopelint
 				}
 
