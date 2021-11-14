@@ -40,6 +40,16 @@ var runCmd = &cli.Command{
 	Name:  "run",
 	Usage: "Start a lotus miner process",
 	Flags: []cli.Flag{
+		&cli.BoolFlag{
+			Name:  "wdpost",
+			Usage: "enable windowPoSt",
+			Value: true,
+		},
+		&cli.BoolFlag{
+			Name:  "wnpost",
+			Usage: "enable winningPoSt",
+			Value: true,
+		},
 		&cli.StringFlag{
 			Name:  "miner-api",
 			Usage: "2345",
@@ -60,6 +70,19 @@ var runCmd = &cli.Command{
 		},
 	},
 	Action: func(cctx *cli.Context) error {
+
+		if cctx.Bool("wdpost") {
+			os.Setenv("LOTUS_WDPOST", "true")
+		} else {
+			os.Unsetenv("LOTUS_WDPOST")
+		}
+
+		if cctx.Bool("wnpost") {
+			os.Setenv("LOTUS_WNPOST", "true")
+		} else {
+			os.Unsetenv("LOTUS_WNPOST")
+		}
+
 		if !cctx.Bool("enable-gpu-proving") {
 			err := os.Setenv("BELLMAN_NO_GPU", "true")
 			if err != nil {
