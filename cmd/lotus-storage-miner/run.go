@@ -51,6 +51,11 @@ var runCmd = &cli.Command{
 			Value: true,
 		},
 		&cli.StringFlag{
+			Name:  "workername",
+			Usage: "worker name will display on jobs list",
+			Value: "",
+		},
+		&cli.StringFlag{
 			Name:  "miner-api",
 			Usage: "2345",
 		},
@@ -81,6 +86,10 @@ var runCmd = &cli.Command{
 			os.Setenv("LOTUS_WNPOST", "true")
 		} else {
 			os.Unsetenv("LOTUS_WNPOST")
+		}
+
+		if cctx.String("workername") != "" {
+			os.Setenv("WORKER_NAME", cctx.String("workername"))
 		}
 
 		if !cctx.Bool("enable-gpu-proving") {
