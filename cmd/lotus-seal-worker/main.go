@@ -109,6 +109,11 @@ var runCmd = &cli.Command{
 			Value: "",
 		},
 		&cli.StringFlag{
+			Name:  "ability",
+			Usage: "worker sealing ability",
+			Value: "AP:1,PC1:1,PC2:1,C1:1,C2:1,FIN:1,GET:1,UNS:1,RD:1",
+		},
+		&cli.StringFlag{
 			Name:  "listen",
 			Usage: "host address and port the worker api will listen on",
 			Value: "0.0.0.0:3456",
@@ -177,6 +182,10 @@ var runCmd = &cli.Command{
 
 		if cctx.String("workername") != "" {
 			os.Setenv("WORKER_NAME", cctx.String("workername"))
+		}
+
+		if cctx.String("ability") != "" {
+			os.Setenv("ABILITY", cctx.String("ability"))
 		}
 
 		if !cctx.Bool("enable-gpu-proving") {
