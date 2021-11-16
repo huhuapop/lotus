@@ -52,7 +52,7 @@ type LocalWorker struct {
 	noSwap     bool
 
 	// see equivalent field on WorkerConfig.
-	ignoreResources bool
+	// ignoreResources bool
 
 	ct          *workerCallTracker
 	acceptTasks map[sealtasks.TaskType]struct{}
@@ -79,12 +79,12 @@ func newLocalWorker(executor ExecutorFunc, wcfg WorkerConfig, store stores.Store
 		ct: &workerCallTracker{
 			st: cst,
 		},
-		acceptTasks:     acceptTasks,
-		executor:        executor,
-		noSwap:          wcfg.NoSwap,
-		ignoreResources: wcfg.IgnoreResourceFiltering,
-		session:         uuid.New(),
-		closing:         make(chan struct{}),
+		acceptTasks: acceptTasks,
+		executor:    executor,
+		noSwap:      wcfg.NoSwap,
+		// ignoreResources: wcfg.IgnoreResourceFiltering,
+		session: uuid.New(),
+		closing: make(chan struct{}),
 	}
 
 	if w.executor == nil {
@@ -513,9 +513,9 @@ func (l *LocalWorker) Info(context.Context) (storiface.WorkerInfo, error) {
 	}
 
 	return storiface.WorkerInfo{
-		Hostname:        hostname,
-		TaskResources:   storiface.NewTaskLimitConfig(),
-		IgnoreResources: l.ignoreResources,
+		Hostname:      hostname,
+		TaskResources: storiface.NewTaskLimitConfig(),
+		// IgnoreResources: l.ignoreResources,
 		Resources: storiface.WorkerResources{
 			MemPhysical: mem.Total,
 			MemSwap:     memSwap,

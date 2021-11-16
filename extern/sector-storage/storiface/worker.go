@@ -26,7 +26,7 @@ type WorkerInfo struct {
 	// be used ignored (true) or used (false) for the purposes of scheduling and
 	// task assignment. Only supported on local workers. Used for testing.
 	// Default should be false (zero value, i.e. resources taken into account).
-	IgnoreResources bool
+	// IgnoreResources bool
 	Resources       WorkerResources
 	TaskResourcesLk sync.Mutex
 	TaskResources   map[sealtasks.TaskType]*TaskConfig
