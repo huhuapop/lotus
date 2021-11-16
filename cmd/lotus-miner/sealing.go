@@ -91,9 +91,15 @@ var sealingWorkersCmd = &cli.Command{
 
 			var barCols = uint64(64)
 			cpuBars := int(stat.CpuUse * barCols / stat.Info.Resources.CPUs)
-			cpuBar := strings.Repeat("|", cpuBars)
-			if int(barCols)-cpuBars >= 0 {
-				cpuBar += strings.Repeat(" ", int(barCols)-cpuBars)
+			// cpuBar := strings.Repeat("|", cpuBars)
+			// if int(barCols)-cpuBars >= 0 {
+			// 	cpuBar += strings.Repeat(" ", int(barCols)-cpuBars)
+			// }
+			cpuBar := ""
+			if int(barCols)-cpuBars > 0 {
+				cpuBar = strings.Repeat("|", cpuBars) + strings.Repeat(" ", int(barCols)-cpuBars)
+			} else {
+				cpuBar = strings.Repeat("|", int(barCols))
 			}
 
 			fmt.Printf("\tCPU:  [%s] %d/%d core(s) in use\n",
@@ -109,9 +115,18 @@ var sealingWorkersCmd = &cli.Command{
 				colorFunc = color.RedString
 			}
 
-			ramBar := colorFunc(strings.Repeat("|", ramBarsRes)) +
-				color.GreenString(strings.Repeat("|", ramBarsUsed)) +
-				strings.Repeat(" ", ramRepeatSpace)
+			// ramBar := colorFunc(strings.Repeat("|", ramBarsRes)) +
+			// 	color.GreenString(strings.Repeat("|", ramBarsUsed)) +
+			// 	strings.Repeat(" ", ramRepeatSpace)
+
+			ramBar := ""
+			if int(barCols)-ramBarsUsed-ramBarsRes > 0 {
+				ramBar = colorFunc(strings.Repeat("|", ramBarsRes)) +
+					color.GreenString(strings.Repeat("|", ramBarsUsed)) +
+					strings.Repeat(" ", ramRepeatSpace)
+			} else {
+				ramBar = strings.Repeat("|", int(barCols))
+			}
 
 			vmem := stat.Info.Resources.MemPhysical + stat.Info.Resources.MemSwap
 
@@ -125,9 +140,18 @@ var sealingWorkersCmd = &cli.Command{
 				colorFunc = color.RedString
 			}
 
-			vmemBar := colorFunc(strings.Repeat("|", vmemBarsRes)) +
-				color.GreenString(strings.Repeat("|", vmemBarsUsed)) +
-				strings.Repeat(" ", vmemRepeatSpace)
+			// vmemBar := colorFunc(strings.Repeat("|", vmemBarsRes)) +
+			// 	color.GreenString(strings.Repeat("|", vmemBarsUsed)) +
+			// 	strings.Repeat(" ", vmemRepeatSpace)
+
+			vmemBar := ""
+			if int(barCols)-vmemBarsUsed-vmemBarsRes > 0 {
+				vmemBar = colorFunc(strings.Repeat("|", vmemBarsRes)) +
+					color.GreenString(strings.Repeat("|", vmemBarsUsed)) +
+					strings.Repeat(" ", vmemRepeatSpace)
+			} else {
+				vmemBar = strings.Repeat("|", int(barCols))
+			}
 
 			fmt.Printf("\tRAM:  [%s] %d%% %s/%s\n", ramBar,
 				(stat.Info.Resources.MemReserved+stat.MemUsedMin)*100/stat.Info.Resources.MemPhysical,
