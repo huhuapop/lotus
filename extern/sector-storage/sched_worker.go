@@ -180,7 +180,7 @@ func (sw *schedWorker) handleWorker() {
 			select {
 			case <-sw.heartbeatTimer.C:
 			case <-worker.workerOnFree:
-				log.Debugw("task done", "workerid", sw.wid)
+				log.Debugw("task done", "workerid", sw.wid, "worker name", sw.worker.info.Hostname)
 				break
 			case <-sched.closing:
 				return
