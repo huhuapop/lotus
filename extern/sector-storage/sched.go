@@ -632,7 +632,7 @@ func (sh *scheduler) trySched() {
 
 			wid := acceptable[best]
 			whl := sh.workers[wid]
-			log.Infof("worker %s will be do %s the %+v jobTask!", whl.info.Hostname, task.sector.ID.Number, task.taskType)
+			log.Infof("worker %s will be do sector %s the %+v jobTask!", whl.info.Hostname, task.sector.ID.Number, task.taskType)
 			sh.schedQueue.Remove(sqi)
 			sqi--
 			if err := sh.assignWorker(wid, whl, task); err != nil {
@@ -829,7 +829,7 @@ func (sh *scheduler) getTaskFreeCount(wid WorkerID, phaseTaskType sealtasks.Task
 		if freeCount >= 0 && c1runCount <= 0 && c2runCount <= 0 { // 需做的任务空闲数量不小于0，且没有c1c2任务在运行
 			return freeCount
 		}
-		log.Infof("worker already doing C1 or C2 taskjob")
+		log.Infof("worker %s already doing C1 or C2 taskjob", whl.info.Hostname)
 		return 0
 	}
 
@@ -839,7 +839,7 @@ func (sh *scheduler) getTaskFreeCount(wid WorkerID, phaseTaskType sealtasks.Task
 		if freeCount >= 0 && p2runCount <= 0 && c2runCount <= 0 { // 需做的任务空闲数量不小于0，且没有p2c2任务在运行
 			return freeCount
 		}
-		log.Infof("worker already doing P2 or C2 taskjob")
+		log.Infof("worker %s already doing P2 or C2 taskjob", whl.info.Hostname)
 		return 0
 	}
 
@@ -849,7 +849,7 @@ func (sh *scheduler) getTaskFreeCount(wid WorkerID, phaseTaskType sealtasks.Task
 		if freeCount >= 0 && p2runCount <= 0 && c1runCount <= 0 { // 需做的任务空闲数量不小于0，且没有p2c1任务在运行
 			return freeCount
 		}
-		log.Infof("worker already doing P2 or C1 taskjob")
+		log.Infof("worker %s already doing P2 or C1 taskjob", whl.info.Hostname)
 		return 0
 	}
 
