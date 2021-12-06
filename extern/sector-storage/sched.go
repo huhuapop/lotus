@@ -632,7 +632,7 @@ func (sh *scheduler) trySched() {
 
 			wid := acceptable[best]
 			whl := sh.workers[wid]
-			log.Infof("worker %s will be do the %+v jobTask!", whl.info.Hostname, task.taskType)
+			log.Infof("worker %s will be do %s the %+v jobTask!", whl.info.Hostname, task.sector.ID.Number, task.taskType)
 			sh.schedQueue.Remove(sqi)
 			sqi--
 			if err := sh.assignWorker(wid, whl, task); err != nil {
@@ -642,7 +642,7 @@ func (sh *scheduler) trySched() {
 		}
 
 		if tried == 0 {
-			log.Infof("no worker do the %+v jobTask!", task.taskType)
+			log.Infof("no worker do sector %s the %+v jobTask!", task.sector.ID.Number, task.taskType)
 		}
 	}
 }
