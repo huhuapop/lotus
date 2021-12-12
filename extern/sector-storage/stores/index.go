@@ -347,17 +347,17 @@ func (i *Index) StorageFindSector(ctx context.Context, s abi.SectorID, ft storif
 			}
 
 			if spaceReq > uint64(st.fsi.Available) {
-				log.Debugf("not selecting on %s, out of space (available: %d, need: %d)", st.info.ID, st.fsi.Available, spaceReq)
+				log.Debugf("not selecting on %s, %s, out of space (available: %d, need: %d)", st.info.ID, st.info.URLs[0], st.fsi.Available, spaceReq)
 				continue
 			}
 
 			if time.Since(st.lastHeartbeat) > SkippedHeartbeatThresh {
-				log.Debugf("not selecting on %s, didn't receive heartbeats for %s", st.info.ID, time.Since(st.lastHeartbeat))
+				log.Debugf("not selecting on %s, %s, didn't receive heartbeats for %s", st.info.ID, st.info.URLs[0], time.Since(st.lastHeartbeat))
 				continue
 			}
 
 			if st.heartbeatErr != nil {
-				log.Debugf("not selecting on %s, heartbeat error: %s", st.info.ID, st.heartbeatErr)
+				log.Debugf("not selecting on %s, %s, heartbeat error: %s", st.info.ID, st.info.URLs[0], st.heartbeatErr)
 				continue
 			}
 
