@@ -573,3 +573,106 @@ func (sh *scheduler) Close(ctx context.Context) error {
 	}
 	return nil
 }
+
+func (sh *scheduler) taskAddOne(wid WorkerID, phaseTaskType sealtasks.TaskType) {
+	if whl, ok := sh.workers[wid]; ok {
+		whl.info.TaskResourcesLk.Lock()
+		defer whl.info.TaskResourcesLk.Unlock()
+		if counts, ok := whl.info.TaskResources[phaseTaskType]; ok {
+			counts.RunCount++
+		}
+	}
+}
+
+func (sh *scheduler) taskReduceOne(wid WorkerID, phaseTaskType sealtasks.TaskType) {
+	if whl, ok := sh.workers[wid]; ok {
+		whl.info.TaskResourcesLk.Lock()
+		defer whl.info.TaskResourcesLk.Unlock()
+		if counts, ok := whl.info.TaskResources[phaseTaskType]; ok {
+			counts.RunCount--
+		}
+	}
+}
+
+func (sh *scheduler) getTaskCount(wid WorkerID, phaseTaskType sealtasks.TaskType, typeCount string) int {
+	if whl, ok := sh.workers[wid]; ok {
+		if counts, ok := whl.info.TaskResources[phaseTaskType]; ok {
+			whl.info.TaskResourcesLk.Lock()
+			defer whl.info.TaskResourcesLk.Unlock()
+			if typeCount == "limit" {
+				return counts.LimitCount
+			}
+			if typeCount == "run" {
+				return counts.RunCount
+			}
+		}
+	}
+	return 0
+}
+
+func (sh *scheduler) getTaskFreeCount(wid WorkerID, phaseTaskType sealtasks.TaskType) int {
+	limitCount := sh.getTaskCount(wid, phaseTaskType, "limit") // json文件限制的任务数量
+	runCount := sh.getTaskCount(wid, phaseTaskType, "run")     // 运行中的任务数量
+	freeCount := limitCount - runCount
+
+	if limitCount == 0 { // 0:禁止
+		return 0
+	}
+
+	whl := sh.workers[wid]
+	log.Infof("worker %s %s: %d free count", whl.info.Hostname, phaseTaskType, freeCount)
+
+	if phaseTaskType == sealtasks.TTAddPiece {
+		p1limitCount := sh.getTaskCount(wid, sealtasks.TTPreCommit1, "limit") // p1最大的任务数量
+		p1runCount := sh.getTaskCount(wid, sealtasks.TTPreCommit1, "run")     // p1运行中的任务数量
+		p1freeCount := p1limitCount - p1runCount                              // p1空闲任务数量
+		if freeCount > 0 && p1freeCount > 0 {                                 // addpice空闲数量大于0，p1空闲任务数量大于0
+			return p1freeCount
+		}
+		return 0
+	}
+
+	if phaseTaskType == sealtasks.TTPreCommit1 {
+		if freeCount >= 0 {
+			return freeCount
+		}
+		return 0
+	}
+
+	if phaseTaskType == sealtasks.TTPreCommit2 {
+		c1runCount := sh.getTaskCount(wid, sealtasks.TTCommit1, "run")
+		c2runCount := sh.getTaskCount(wid, sealtasks.TTCommit2, "run")
+		if freeCount >= 0 && c1runCount <= 0 && c2runCount <= 0 { // 需做的任务空闲数量不小于0，且没有c1c2任务在运行
+			return freeCount
+		}
+		log.Infof("worker already doing C1 or C2 taskjob")
+		return 0
+	}
+
+	if phaseTaskType == sealtasks.TTCommit1 {
+		p2runCount := sh.getTaskCount(wid, sealtasks.TTPreCommit2, "run")
+		c2runCount := sh.getTaskCount(wid, sealtasks.TTCommit2, "run")
+		if freeCount >= 0 && p2runCount <= 0 && c2runCount <= 0 { // 需做的任务空闲数量不小于0，且没有p2c2任务在运行
+			return freeCount
+		}
+		log.Infof("worker already doing P2 or C2 taskjob")
+		return 0
+	}
+
+	if phaseTaskType == sealtasks.TTCommit2 {
+		p2runCount := sh.getTaskCount(wid, sealtasks.TTPreCommit2, "run")
+		c1runCount := sh.getTaskCount(wid, sealtasks.TTCommit1, "run")
+		if freeCount >= 0 && p2runCount <= 0 && c1runCount <= 0 { // 需做的任务空闲数量不小于0，且没有p2c1任务在运行
+			return freeCount
+		}
+		log.Infof("worker already doing P2 or C1 taskjob")
+		return 0
+	}
+
+	if phaseTaskType == sealtasks.TTFetch || phaseTaskType == sealtasks.TTFinalize ||
+		phaseTaskType == sealtasks.TTUnseal || phaseTaskType == sealtasks.TTReadUnsealed { // 不限制
+		return 1
+	}
+
+	return 0
+}
