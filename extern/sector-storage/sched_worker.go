@@ -47,10 +47,8 @@ func (sh *scheduler) runWorker(ctx context.Context, w Worker) error {
 		active:    &activeResources{},
 		enabled:   true,
 
-		closingMgr:   make(chan struct{}),
-		closedMgr:    make(chan struct{}),
-		workerOnFree: make(chan struct{}),
-		todo:         make([]*workerRequest, 0),
+		closingMgr: make(chan struct{}),
+		closedMgr:  make(chan struct{}),
 	}
 
 	wid := storiface.WorkerID(sessID)
@@ -117,88 +115,60 @@ func (sw *schedWorker) handleWorker() {
 			// ask for more windows if we need them (non-blocking)
 			if enabled {
 				if !sw.requestWindows() {
-					// return // graceful shutdown
-					sched.workerChange <- struct{}{} // worker空闲申请调度
+					return // graceful shutdown
 				}
 			}
 		}
 
 		// wait for more windows to come in, or for tasks to get finished (blocking)
 		for {
-			// // ping the worker and check session
-			// if !sw.checkSession(ctx) {
-			// 	return // invalid session / exiting
-			// }
-
-			// // session looks good
-			// {
-			// 	sched.workersLk.Lock()
-			// 	enabled := worker.enabled
-			// 	worker.enabled = true
-			// 	sched.workersLk.Unlock()
-
-			// 	if !enabled {
-			// 		// go send window requests
-			// 		break
-			// 	}
-			// }
-
-			// // wait for more tasks to be assigned by the main scheduler or for the worker
-			// // to finish precessing a task
-			// update, pokeSched, ok := sw.waitForUpdates()
-			// if !ok {
-			// 	return
-			// }
-			// if pokeSched {
-			// 	// a task has finished preparing, which can mean that we've freed some space on some worker
-			// 	select {
-			// 	case sched.workerChange <- struct{}{}:
-			// 	default: // workerChange is buffered, and scheduling is global, so it's ok if we don't send here
-			// 	}
-			// }
-			// if update {
-			// 	break
-			// }
-
-			// 循环等待woker做完任务返回或有调度窗口进来，// wait for more windows to come in, or for tasks to get finished (blocking)
-			if !sw.checkSession(ctx) { // ping the worker and check session 如果连接不上，禁用后一直试探；如果检查发现session id不一致则弃用
+			// ping the worker and check session
+			if !sw.checkSession(ctx) {
 				return // invalid session / exiting
 			}
 
-			{ // session looks good
+			// session looks good
+			{
 				sched.workersLk.Lock()
 				enabled := worker.enabled
 				worker.enabled = true
 				sched.workersLk.Unlock()
 
 				if !enabled {
-					break // go send window requests
+					// go send window requests
+					break
 				}
 			}
 
-			select {
-			case <-sw.heartbeatTimer.C:
-			case <-worker.workerOnFree:
-				log.Debugw("task done", "workerid", sw.wid)
+			// wait for more tasks to be assigned by the main scheduler or for the worker
+			// to finish precessing a task
+			update, pokeSched, ok := sw.waitForUpdates()
+			if !ok {
+				return
+			}
+			if pokeSched {
+				// a task has finished preparing, which can mean that we've freed some space on some worker
+				select {
+				case sched.workerChange <- struct{}{}:
+				default: // workerChange is buffered, and scheduling is global, so it's ok if we don't send here
+				}
+			}
+			if update {
 				break
-			case <-sched.closing:
-				return
-			case <-worker.closingMgr:
-				return
 			}
 		}
 
-		// // process assigned windows (non-blocking)
-		// sched.workersLk.RLock()
-		// worker.wndLk.Lock()
+		// process assigned windows (non-blocking)
+		sched.workersLk.RLock()
+		worker.wndLk.Lock()
 
-		// sw.workerCompactWindows()
+		sw.workerCompactWindows()
 
-		// // send tasks to the worker
-		// sw.processAssignedWindows()
+		// send tasks to the worker
+		sw.processAssignedWindows()
 
-		// worker.wndLk.Unlock()
-		// sched.workersLk.RUnlock()
+		worker.wndLk.Unlock()
+		sched.workersLk.RUnlock()
 	}
 }
 
@@ -530,7 +500,7 @@ func (sw *schedWorker) startProcessingTask(req *workerRequest) error {
 		}()
 
 		// wait (if needed) for resources in the 'active' window
-		err = w.active.withResources(sw.wid, w.info.Resources, needRes, &w.lk, func() error {
+		err = w.active.withResources(sw.wid, w.info, needRes, &w.lk, func() error {
 			w.preparing.free(w.info.Resources, needRes)
 			w.lk.Unlock()
 			defer w.lk.Lock() // we MUST return locked from this function
