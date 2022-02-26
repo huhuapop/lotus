@@ -6,21 +6,41 @@ import (
 	"github.com/filecoin-project/lotus/extern/sector-storage/storiface"
 )
 
-func (a *activeResources) withResources(id storiface.WorkerID, wr storiface.WorkerInfo, r storiface.Resources, locker sync.Locker, cb func() error) error {
-	for !a.canHandleRequest(r, id, "withResources", wr) {
-		if a.cond == nil {
-			a.cond = sync.NewCond(locker)
-		}
-		a.waiting++
-		a.cond.Wait()
-		a.waiting--
-	}
+// func (a *activeResources) withResources(id storiface.WorkerID, wr storiface.WorkerInfo, r storiface.Resources, locker sync.Locker, cb func() error) error {
+// 	for !a.canHandleRequest(r, id, "withResources", wr) {
+// 		if a.cond == nil {
+// 			a.cond = sync.NewCond(locker)
+// 		}
+// 		a.waiting++
+// 		a.cond.Wait()
+// 		a.waiting--
+// 	}
 
-	a.add(wr.Resources, r)
+// 	a.add(wr.Resources, r)
+
+// 	err := cb()
+
+// 	a.free(wr.Resources, r)
+
+// 	return err
+// }
+
+func (a *activeResources) withResources(id WorkerID, wr storiface.WorkerResources, r Resources, locker sync.Locker, cb func() error) error {
+	// for !a.canHandleRequest(r, id, "withResources", wr) {
+	// 	if a.cond == nil {
+	// 		a.cond = sync.NewCond(locker)
+	// 	}
+	// 	a.cond.Wait()
+	// }
+
+	a.add(wr, r)
 
 	err := cb()
 
-	a.free(wr.Resources, r)
+	a.free(wr, r)
+	// if a.cond != nil {
+	// 	a.cond.Broadcast()
+	// }
 
 	return err
 }
