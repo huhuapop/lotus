@@ -366,17 +366,17 @@ func (i *Index) StorageFindSector(ctx context.Context, s abi.SectorID, ft storif
 			}
 
 			if spaceReq > uint64(st.fsi.Available) {
-				log.Debugf("not selecting on %s, out of space (available: %d, need: %d)", st.info.ID, st.fsi.Available, spaceReq)
+				log.Debugf("not selecting on %s, %s, out of space (available: %d, need: %d)", st.info.ID, st.info.URLs[0], st.fsi.Available, spaceReq)
 				continue
 			}
 
 			if time.Since(st.lastHeartbeat) > SkippedHeartbeatThresh {
-				log.Debugf("not selecting on %s, didn't receive heartbeats for %s", st.info.ID, time.Since(st.lastHeartbeat))
+				log.Debugf("not selecting on %s, %s, didn't receive heartbeats for %s", st.info.ID, st.info.URLs[0], time.Since(st.lastHeartbeat))
 				continue
 			}
 
 			if st.heartbeatErr != nil {
-				log.Debugf("not selecting on %s, heartbeat error: %s", st.info.ID, st.heartbeatErr)
+				log.Debugf("not selecting on %s, %s, heartbeat error: %s", st.info.ID, st.info.URLs[0], st.heartbeatErr)
 				continue
 			}
 
@@ -468,17 +468,17 @@ func (i *Index) StorageBestAlloc(ctx context.Context, allocate storiface.SectorF
 		}
 
 		if spaceReq > uint64(p.fsi.Available) {
-			log.Debugf("not allocating on %s, out of space (available: %d, need: %d)", p.info.ID, p.fsi.Available, spaceReq)
+			log.Debugf("not allocating on %s, %s, out of space (available: %d, need: %d)", p.info.ID, p.info.URLs[0], p.fsi.Available, spaceReq)
 			continue
 		}
 
 		if time.Since(p.lastHeartbeat) > SkippedHeartbeatThresh {
-			log.Debugf("not allocating on %s, didn't receive heartbeats for %s", p.info.ID, time.Since(p.lastHeartbeat))
+			log.Debugf("not allocating on %s, %s, didn't receive heartbeats for %s", p.info.ID, p.info.URLs[0], time.Since(p.lastHeartbeat))
 			continue
 		}
 
 		if p.heartbeatErr != nil {
-			log.Debugf("not allocating on %s, heartbeat error: %s", p.info.ID, p.heartbeatErr)
+			log.Debugf("not allocating on %s, %s, heartbeat error: %s", p.info.ID, p.info.URLs[0], p.heartbeatErr)
 			continue
 		}
 
@@ -543,17 +543,17 @@ func (i *Index) MaybeAddPice(ctx context.Context, allocate storiface.SectorFileT
 		}
 
 		if (spaceReq * 10) > uint64(p.fsi.Available) {
-			log.Debugf("not allocating on %s, out of space (available: %d, need: %d)", p.info.ID, p.fsi.Available, spaceReq)
+			log.Debugf("not allocating on %s, %s, out of space (available: %d, need: %d)", p.info.ID, p.info.URLs[0], p.fsi.Available, spaceReq)
 			continue
 		}
 
 		if time.Since(p.lastHeartbeat) > SkippedHeartbeatThresh {
-			log.Debugf("not allocating on %s, didn't receive heartbeats for %s", p.info.ID, time.Since(p.lastHeartbeat))
+			log.Debugf("not allocating on %s, %s, didn't receive heartbeats for %s", p.info.ID, p.info.URLs[0], time.Since(p.lastHeartbeat))
 			continue
 		}
 
 		if p.heartbeatErr != nil {
-			log.Debugf("not allocating on %s, heartbeat error: %s", p.info.ID, p.heartbeatErr)
+			log.Debugf("not allocating on %s, %s, heartbeat error: %s", p.info.ID, p.info.URLs[0], p.heartbeatErr)
 			continue
 		}
 
