@@ -610,7 +610,7 @@ func (sh *scheduler) getTaskCount(wid storiface.WorkerID, phaseTaskType sealtask
 	return 0
 }
 
-func (sh *scheduler) getTaskFreeCount(wid WorkerID, phaseTaskType sealtasks.TaskType) int {
+func (sh *scheduler) getTaskFreeCount(wid storiface.WorkerID, phaseTaskType sealtasks.TaskType) int {
 	limitCount := sh.getTaskCount(wid, phaseTaskType, "limit") // json文件限制的任务数量
 	runCount := sh.getTaskCount(wid, phaseTaskType, "run")     // 运行中的任务数量
 	freeCount := limitCount - runCount
