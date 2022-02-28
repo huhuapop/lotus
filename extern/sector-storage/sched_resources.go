@@ -25,7 +25,7 @@ import (
 // 	return err
 // }
 
-func (a *activeResources) withResources(id storiface.WorkerID, wr storiface.WorkerResources, r storiface.Resources, locker sync.Locker, cb func() error) error {
+func (a *activeResources) withResources(id WorkerID, wr storiface.WorkerResources, r Resources, locker sync.Locker, cb func() error) error {
 	// for !a.canHandleRequest(r, id, "withResources", wr) {
 	// 	if a.cond == nil {
 	// 		a.cond = sync.NewCond(locker)
