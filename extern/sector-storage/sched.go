@@ -2,6 +2,8 @@ package sectorstorage
 
 import (
 	"context"
+	"math/rand"
+	"sort"
 	"sync"
 	"time"
 
@@ -588,7 +590,7 @@ func (sh *scheduler) trySched() {
 		task := (*sh.schedQueue)[sqi]
 
 		tried := 0
-		var acceptable []storiface.WorkerID
+		var acceptable []WorkerID
 		var freetable []int
 		best := 0
 		localWorker := false
@@ -652,9 +654,9 @@ func (sh *scheduler) trySched() {
 	}
 }
 
-func (sh *scheduler) assignWorker(wid storiface.WorkerID, w *workerHandle, req *workerRequest) error {
+func (sh *scheduler) assignWorker(wid WorkerID, w *workerHandle, req *workerRequest) error {
 	sh.taskAddOne(wid, req.taskType)
-	needRes := storiface.ResourceTable[req.taskType][req.sector.ProofType]
+	needRes := ResourceTable[req.taskType][req.sector.ProofType]
 
 	w.lk.Lock()
 	w.preparing.add(w.info.Resources, needRes)
