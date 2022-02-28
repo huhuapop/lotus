@@ -654,8 +654,7 @@ func (sh *scheduler) trySched() {
 
 func (sh *scheduler) assignWorker(wid storiface.WorkerID, w *workerHandle, req *workerRequest) error {
 	sh.taskAddOne(wid, req.taskType)
-	// needRes := storiface.ResourceTable[req.taskType][req.sector.ProofType]
-	needRes := w.info.Resources.ResourceSpec(task.sector.ProofType, task.taskType)
+	needRes := storiface.ResourceTable[req.taskType][req.sector.ProofType]
 
 	w.lk.Lock()
 	w.preparing.add(w.info.Resources, needRes)
