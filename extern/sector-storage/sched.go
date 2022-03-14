@@ -574,7 +574,7 @@ func (sh *scheduler) Close(ctx context.Context) error {
 	return nil
 }
 
-func (sh *scheduler) taskAddOne(wid WorkerID, phaseTaskType sealtasks.TaskType) {
+func (sh *scheduler) taskAddOne(wid storiface.WorkerID, phaseTaskType sealtasks.TaskType) {
 	if whl, ok := sh.workers[wid]; ok {
 		whl.info.TaskResourcesLk.Lock()
 		defer whl.info.TaskResourcesLk.Unlock()
@@ -584,7 +584,7 @@ func (sh *scheduler) taskAddOne(wid WorkerID, phaseTaskType sealtasks.TaskType) 
 	}
 }
 
-func (sh *scheduler) taskReduceOne(wid WorkerID, phaseTaskType sealtasks.TaskType) {
+func (sh *scheduler) taskReduceOne(wid storiface.WorkerID, phaseTaskType sealtasks.TaskType) {
 	if whl, ok := sh.workers[wid]; ok {
 		whl.info.TaskResourcesLk.Lock()
 		defer whl.info.TaskResourcesLk.Unlock()
@@ -594,7 +594,7 @@ func (sh *scheduler) taskReduceOne(wid WorkerID, phaseTaskType sealtasks.TaskTyp
 	}
 }
 
-func (sh *scheduler) getTaskCount(wid WorkerID, phaseTaskType sealtasks.TaskType, typeCount string) int {
+func (sh *scheduler) getTaskCount(wid storiface.WorkerID, phaseTaskType sealtasks.TaskType, typeCount string) int {
 	if whl, ok := sh.workers[wid]; ok {
 		if counts, ok := whl.info.TaskResources[phaseTaskType]; ok {
 			whl.info.TaskResourcesLk.Lock()
@@ -610,7 +610,7 @@ func (sh *scheduler) getTaskCount(wid WorkerID, phaseTaskType sealtasks.TaskType
 	return 0
 }
 
-func (sh *scheduler) getTaskFreeCount(wid WorkerID, phaseTaskType sealtasks.TaskType) int {
+func (sh *scheduler) getTaskFreeCount(wid storiface.WorkerID, phaseTaskType sealtasks.TaskType) int {
 	limitCount := sh.getTaskCount(wid, phaseTaskType, "limit") // json文件限制的任务数量
 	runCount := sh.getTaskCount(wid, phaseTaskType, "run")     // 运行中的任务数量
 	freeCount := limitCount - runCount
