@@ -122,7 +122,6 @@ func (wt *workTracker) track(ctx context.Context, ready chan struct{}, wid stori
 }
 
 func (wt *workTracker) worker(wid storiface.WorkerID, wi storiface.WorkerInfo, w Worker) *trackedWorker {
-	log.Infof("worker init begin")
 	return &trackedWorker{
 		Worker:     w,
 		wid:        wid,
