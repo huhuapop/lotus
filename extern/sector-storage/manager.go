@@ -119,6 +119,7 @@ type WorkerStateStore *statestore.StateStore
 type ManagerStateStore *statestore.StateStore
 
 func New(ctx context.Context, lstor *stores.Local, stor *stores.Remote, ls stores.LocalStorage, si stores.SectorIndex, sc SealerConfig, wss WorkerStateStore, mss ManagerStateStore) (*Manager, error) {
+	log.Infof("worker new begin")
 	prover, err := ffiwrapper.New(&readonlyProvider{stor: lstor, index: si})
 	if err != nil {
 		return nil, xerrors.Errorf("creating prover instance: %w", err)
@@ -183,6 +184,7 @@ func New(ctx context.Context, lstor *stores.Local, stor *stores.Remote, ls store
 	if err != nil {
 		return nil, xerrors.Errorf("adding local worker: %w", err)
 	}
+	log.Infof("worker new end")
 
 	return m, nil
 }

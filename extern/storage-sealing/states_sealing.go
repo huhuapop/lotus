@@ -27,6 +27,7 @@ var DealSectorPriority = 1024
 var MaxTicketAge = policy.MaxPreCommitRandomnessLookback
 
 func (m *Sealing) handlePacking(ctx statemachine.Context, sector SectorInfo) error {
+	log.Debugw("start packing")
 	m.inputLk.Lock()
 	// make sure we not accepting deals into this sector
 	for _, c := range m.assignedPieces[m.minerSectorID(sector.SectorNumber)] {

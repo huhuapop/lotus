@@ -664,13 +664,17 @@ func (sh *scheduler) schedClose() {
 }
 
 func (sh *scheduler) assignWorker(wid storiface.WorkerID, w *workerHandle, req *workerRequest) error {
+	log.Infof("assignWorker begin")
 	sh.taskAddOne(wid, req.taskType)
 	needRes := storiface.ResourceTable[req.taskType][req.sector.ProofType]
+
+	log.Infof("assignWorker needRes")
 
 	w.lk.Lock()
 	w.preparing.add(w.info.Resources, needRes)
 	w.lk.Unlock()
 
+	log.Infof("assignWorker preparing")
 	go func() {
 		err := req.prepare(req.ctx, sh.workTracker.worker(wid, w.info, w.workerRpc)) // fetch扇区
 		sh.workersLk.Lock()
@@ -698,6 +702,7 @@ func (sh *scheduler) assignWorker(wid storiface.WorkerID, w *workerHandle, req *
 			return
 		}
 
+		log.Infof("assignWorker active withResources begin")
 		err = w.active.withResources(wid, w.info.Resources, needRes, &sh.workersLk, func() error {
 			w.lk.Lock()
 			w.preparing.free(w.info.Resources, needRes)
@@ -709,9 +714,14 @@ func (sh *scheduler) assignWorker(wid storiface.WorkerID, w *workerHandle, req *
 			case w.workerOnFree <- struct{}{}:
 			case <-sh.closing:
 			}
+			log.Infof("assignWorker active withResources work begin")
+			log.Infof("assignWorker wid: %+v  ", wid)
 
-			err = req.work(req.ctx, sh.workTracker.worker(wid, w.info, w.workerRpc))
-
+			_worker := sh.workTracker.worker(wid, w.info, w.workerRpc)
+			log.Infof("assignWorker _worker: %+v  ", _worker)
+			err := req.work(req.ctx, _worker)
+			// err := req.work(req.ctx, sh.workTracker.worker(wid, w.info, w.workerRpc))
+			log.Infof("assignWorker active withResources work end")
 			select {
 			case req.ret <- workerResponse{err: err}:
 			case <-req.ctx.Done():
@@ -719,7 +729,7 @@ func (sh *scheduler) assignWorker(wid storiface.WorkerID, w *workerHandle, req *
 			case <-sh.closing:
 				log.Warnf("scheduler closed while sending response")
 			}
-
+			log.Infof("assignWorker active withResources worker status %+v", req.taskType)
 			if req.taskType == sealtasks.TTAddPiece { // 为防止addpice过快睡眠3分钟
 				time.Sleep(time.Second * 180)
 			}
@@ -727,6 +737,7 @@ func (sh *scheduler) assignWorker(wid storiface.WorkerID, w *workerHandle, req *
 
 			return nil
 		})
+		log.Infof("assignWorker active withResources end")
 
 		sh.workersLk.Unlock()
 
