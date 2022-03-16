@@ -50,11 +50,11 @@ func (s *allocSelector) Ok(ctx context.Context, task sealtasks.TaskType, spt abi
 		return false, xerrors.Errorf("getting sector size: %w", err)
 	}
 
-	// if task == sealtasks.TTAddPiece {
-	// 	if isAddPice := s.index.MaybeAddPice(ctx, s.alloc, ssize, s.ptype); !isAddPice {
-	// 		return false, xerrors.Errorf("disk space issue")
-	// 	}
-	// }
+	if task == sealtasks.TTAddPiece {
+		if isAddPice := s.index.MaybeAddPice(ctx, s.alloc, ssize, s.ptype); !isAddPice {
+			return false, xerrors.Errorf("disk space issue")
+		}
+	}
 
 	best, err := s.index.StorageBestAlloc(ctx, s.alloc, ssize, s.ptype)
 	if err != nil {
