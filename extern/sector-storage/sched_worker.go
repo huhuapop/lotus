@@ -125,23 +125,23 @@ func (sw *schedWorker) handleWorker() {
 
 		// wait for more windows to come in, or for tasks to get finished (blocking)
 		for {
-			// ping the worker and check session
-			if !sw.checkSession(ctx) {
-				return // invalid session / exiting
-			}
+			// // ping the worker and check session
+			// if !sw.checkSession(ctx) {
+			// 	return // invalid session / exiting
+			// }
 
-			// session looks good
-			{
-				sched.workersLk.Lock()
-				enabled := worker.enabled
-				worker.enabled = true
-				sched.workersLk.Unlock()
+			// // session looks good
+			// {
+			// 	sched.workersLk.Lock()
+			// 	enabled := worker.enabled
+			// 	worker.enabled = true
+			// 	sched.workersLk.Unlock()
 
-				if !enabled {
-					// go send window requests
-					break
-				}
-			}
+			// 	if !enabled {
+			// 		// go send window requests
+			// 		break
+			// 	}
+			// }
 
 			// // wait for more tasks to be assigned by the main scheduler or for the worker
 			// // to finish precessing a task
@@ -176,46 +176,29 @@ func (sw *schedWorker) handleWorker() {
 				}
 			}
 
-			// select {
-			// case <-sw.heartbeatTimer.C:
-			// case <-worker.workerOnFree:
-			// 	log.Debugw("task done", "workerid", sw.wid)
-			// 	break
-			// case <-sched.closing:
-			// 	return
-			// case <-worker.closingMgr:
-			// 	return
-			// }
-
-			// wait for more tasks to be assigned by the main scheduler or for the worker
-			// to finish precessing a task
-			update, pokeSched, ok := sw.waitForUpdates()
-			if !ok {
-				return
-			}
-			if pokeSched {
-				// a task has finished preparing, which can mean that we've freed some space on some worker
-				select {
-				case sched.workerChange <- struct{}{}:
-				default: // workerChange is buffered, and scheduling is global, so it's ok if we don't send here
-				}
-			}
-			if update {
+			select {
+			case <-sw.heartbeatTimer.C:
+			case <-worker.workerOnFree:
+				log.Debugw("task done", "workerid", sw.wid)
 				break
+			case <-sched.closing:
+				return
+			case <-worker.closingMgr:
+				return
 			}
 		}
 
-		// process assigned windows (non-blocking)
-		sched.workersLk.RLock()
-		worker.wndLk.Lock()
+		// // process assigned windows (non-blocking)
+		// sched.workersLk.RLock()
+		// worker.wndLk.Lock()
 
-		sw.workerCompactWindows()
+		// sw.workerCompactWindows()
 
-		// send tasks to the worker
-		sw.processAssignedWindows()
+		// // send tasks to the worker
+		// sw.processAssignedWindows()
 
-		worker.wndLk.Unlock()
-		sched.workersLk.RUnlock()
+		// worker.wndLk.Unlock()
+		// sched.workersLk.RUnlock()
 	}
 }
 
