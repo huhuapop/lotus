@@ -86,7 +86,7 @@ func (s *existingSelector) FindDataWoker(ctx context.Context, task sealtasks.Tas
 		return false
 	}
 
-	have := map[stores.ID]struct{}{}
+	have := map[storiface.ID]struct{}{}
 	for _, path := range paths {
 		have[path.ID] = struct{}{}
 	}
