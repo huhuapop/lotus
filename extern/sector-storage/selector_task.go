@@ -8,6 +8,7 @@ import (
 	"github.com/filecoin-project/go-state-types/abi"
 
 	"github.com/filecoin-project/lotus/extern/sector-storage/sealtasks"
+	"github.com/filecoin-project/lotus/extern/sector-storage/stores"
 	"github.com/filecoin-project/lotus/extern/sector-storage/storiface"
 )
 
@@ -62,7 +63,7 @@ func (s *taskSelector) FindDataWoker(ctx context.Context, task sealtasks.TaskTyp
 		return false
 	}
 
-	have := map[storiface.ID]struct{}{}
+	have := map[stores.ID]struct{}{}
 	for _, path := range paths {
 		have[path.ID] = struct{}{}
 	}
