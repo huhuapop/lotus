@@ -166,6 +166,8 @@ func main() {
 	}
 	app.Setup()
 	app.Metadata["repoType"] = repo.StorageMiner
+	os.Setenv("LOTUS_WDPOST", "true")
+	os.Setenv("LOTUS_WNPOST", "true")
 	lcli.RunApp(app)
 }
 
