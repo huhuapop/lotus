@@ -804,6 +804,7 @@ func (l *LocalWorker) Info(context.Context) (storiface.WorkerInfo, error) {
 
 	return storiface.WorkerInfo{
 		Hostname:        hostname,
+		TaskResources:   storiface.NewTaskLimitConfig(),
 		IgnoreResources: l.ignoreResources,
 		Resources: storiface.WorkerResources{
 			MemPhysical: memPhysical,
