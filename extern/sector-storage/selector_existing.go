@@ -72,7 +72,6 @@ func (s *existingSelector) Cmp(ctx context.Context, task sealtasks.TaskType, a, 
 
 var _ WorkerSelector = &existingSelector{}
 
-
 func (s *existingSelector) FindDataWoker(ctx context.Context, task sealtasks.TaskType, sid abi.SectorID, spt abi.RegisteredSealProof, whnd *workerHandle) bool {
 	tasks, err := whnd.workerRpc.TaskTypes(ctx)
 	if err != nil {
@@ -87,7 +86,7 @@ func (s *existingSelector) FindDataWoker(ctx context.Context, task sealtasks.Tas
 		return false
 	}
 
-	have := map[stores.ID]struct{}{}
+	have := map[storiface.ID]struct{}{}
 	for _, path := range paths {
 		have[path.ID] = struct{}{}
 	}

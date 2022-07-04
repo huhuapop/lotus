@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/fatih/color"
 	logging "github.com/ipfs/go-log/v2"
