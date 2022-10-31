@@ -807,8 +807,13 @@ func (l *LocalWorker) Info(context.Context) (storiface.WorkerInfo, error) {
 		return storiface.WorkerInfo{}, xerrors.Errorf("interpreting resource env vars: %w", err)
 	}
 
+	hostname := l.name
+	if env, ok := os.LookupEnv("WORKER_NAME"); ok {
+		hostname = hostname + "-" + env
+	}
+
 	return storiface.WorkerInfo{
-		Hostname:        l.name,
+		Hostname:        hostname,
 		IgnoreResources: l.ignoreResources,
 		Resources: storiface.WorkerResources{
 			MemPhysical: memPhysical,
