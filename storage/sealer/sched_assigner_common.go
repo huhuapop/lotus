@@ -148,7 +148,7 @@ func (a *AssignerCommon) TrySched(sh *Scheduler) {
 
 	wg.Wait()
 
-	log.Debugf("SCHED windows: %+v", windows)
+	// log.Debugf("SCHED windows: %+v", windows)
 	log.Debugf("SCHED Acceptable win: %+v", acceptableWindows)
 
 	// Step 2
