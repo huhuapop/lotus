@@ -44,7 +44,7 @@ Percent of threads to allocate to parallel tasks
 64  * 0.92 = 58
 128 * 0.92 = 117
 */
-var ParallelNum uint64 = 3
+var ParallelNum uint64 = 92
 var ParallelDenom uint64 = 100
 
 // TODO: Take NUMA into account
