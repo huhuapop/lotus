@@ -73,7 +73,7 @@ func defCommon() Common {
 }
 
 var (
-	DefaultDefaultMaxFee         = types.MustParseFIL("0.07")
+	DefaultDefaultMaxFee         = types.MustParseFIL("0.27")
 	DefaultSimultaneousTransfers = uint64(20)
 )
 
