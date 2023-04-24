@@ -25,6 +25,7 @@ const (
 
 	TTFetch  TaskType = "seal/v0/fetch"
 	TTUnseal TaskType = "seal/v0/unseal"
+	TTReadUnsealed TaskType = "seal/v0/unsealread"
 
 	TTReplicaUpdate         TaskType = "seal/v0/replicaupdate"
 	TTProveReplicaUpdate1   TaskType = "seal/v0/provereplicaupdate/1"
@@ -52,6 +53,7 @@ var order = map[TaskType]int{
 	TTUnseal:              1,
 
 	TTFetch:            -1,
+	TTReadUnsealed: -1,
 	TTDownloadSector:   -2,
 	TTFinalize:         -3,
 	TTFinalizeUnsealed: -4,
@@ -74,6 +76,7 @@ var shortNames = map[TaskType]string{
 
 	TTFetch:  "GET",
 	TTUnseal: "UNS",
+	TTReadUnsealed: "RD",
 
 	TTReplicaUpdate:         "RU",
 	TTProveReplicaUpdate1:   "PR1",
