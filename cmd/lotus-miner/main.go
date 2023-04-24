@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/fatih/color"
 	logging "github.com/ipfs/go-log/v2"
@@ -165,6 +166,8 @@ func main() {
 	}
 	app.Setup()
 	app.Metadata["repoType"] = repo.StorageMiner
+	os.Setenv("LOTUS_WDPOST", "true")
+	os.Setenv("LOTUS_WNPOST", "true")
 	lcli.RunApp(app)
 }
 
