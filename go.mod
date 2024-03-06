@@ -76,6 +76,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/golang-lru/arc/v2 v2.0.5
 	github.com/hashicorp/golang-lru/v2 v2.0.5
+	github.com/huhuapop/sector-counter v0.0.0-20211111185659-eab9c68cab4b // indirect
 	github.com/icza/backscanner v0.0.0-20210726202459-ac2ffc679f94
 	github.com/influxdata/influxdb1-client v0.0.0-20200827194710-b269163b24ab
 	github.com/ipfs/bbloom v0.0.4
@@ -340,3 +341,5 @@ replace github.com/KarpelesLab/reflink => github.com/magik6k/reflink v1.0.2-patc
 replace github.com/filecoin-project/filecoin-ffi => ./extern/filecoin-ffi
 
 replace github.com/filecoin-project/test-vectors => ./extern/test-vectors
+
+replace github.com/huhuapop/sector-counter => ./extern/sector-counter
