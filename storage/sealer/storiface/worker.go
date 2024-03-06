@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/google/uuid"
 	"github.com/ipfs/go-cid"
@@ -33,6 +34,8 @@ type WorkerInfo struct {
 	// Default should be false (zero value, i.e. resources taken into account).
 	IgnoreResources bool
 	Resources       WorkerResources
+	TaskResourcesLk sync.Mutex
+	TaskResources   map[sealtasks.TaskType]*TaskConfig
 }
 
 type WorkerResources struct {
@@ -46,6 +49,9 @@ type WorkerResources struct {
 
 	// if nil use the default resource table
 	Resources map[sealtasks.TaskType]map[abi.RegisteredSealProof]Resources
+
+	TaskResourcesLk sync.Mutex
+	TaskResources   map[sealtasks.TaskType]*TaskConfig
 }
 
 func (wr WorkerResources) ResourceSpec(spt abi.RegisteredSealProof, tt sealtasks.TaskType) Resources {
