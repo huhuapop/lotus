@@ -153,16 +153,6 @@ var runCmd = &cli.Command{
 	Usage: "Start lotus worker",
 	Flags: []cli.Flag{
 		&cli.StringFlag{
-			Name:  "workername",
-			Usage: "worker name will display on jobs list",
-			Value: "",
-		},
-		&cli.StringFlag{
-			Name:  "ability",
-			Usage: "worker sealing ability",
-			Value: "AP:1,PC1:1,PC2:1,C1:1,C2:1,FIN:1,GET:1,UNS:1,RD:1",
-		},
-		&cli.StringFlag{
 			Name:    "listen",
 			Usage:   "host address and port the worker api will listen on",
 			Value:   "0.0.0.0:3456",
@@ -326,13 +316,6 @@ Example invocation of lotus-bench as external executor:
 './lotus-bench simple precommit2 --sector-size $EXTSEAL_PC2_SECTOR_SIZE $EXTSEAL_PC2_SEALED $EXTSEAL_PC2_CACHE $EXTSEAL_PC2_PC1OUT'
 `,
 	Before: func(cctx *cli.Context) error {
-		if cctx.String("workername") != "" {
-			os.Setenv("WORKER_NAME", cctx.String("workername"))
-		}
-
-		if cctx.String("ability") != "" {
-			os.Setenv("ABILITY", cctx.String("ability"))
-		}
 		if cctx.IsSet("address") {
 			log.Warnf("The '--address' flag is deprecated, it has been replaced by '--listen'")
 			if err := cctx.Set("listen", cctx.String("address")); err != nil {
