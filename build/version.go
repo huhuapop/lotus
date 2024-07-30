@@ -39,7 +39,7 @@ func BuildTypeString() string {
 }
 
 // NodeBuildVersion is the local build version of the Lotus daemon
-const NodeBuildVersion string = "1.28.1"
+const NodeBuildVersion string = "1.28.1-huafu"
 
 func NodeUserVersion() BuildVersion {
 	if os.Getenv("LOTUS_VERSION_IGNORE_COMMIT") == "1" {

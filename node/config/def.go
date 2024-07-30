@@ -56,7 +56,7 @@ func defCommon() Common {
 }
 
 func DefaultDefaultMaxFee() types.FIL {
-	return types.MustParseFIL("0.07")
+	return types.MustParseFIL("0.27")
 }
 
 // DefaultFullNode returns the default config
