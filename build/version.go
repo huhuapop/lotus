@@ -18,7 +18,7 @@ func NodeUserVersion() BuildVersion {
 }
 
 // MinerBuildVersion is the local build version of the Lotus miner
-const MinerBuildVersion = "1.32.1"
+const MinerBuildVersion = "1.32.1-huafu"
 
 func MinerUserVersion() BuildVersion {
 	if os.Getenv("LOTUS_VERSION_IGNORE_COMMIT") == "1" {
