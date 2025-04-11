@@ -81,6 +81,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/golang-lru/arc/v2 v2.0.7
 	github.com/hashicorp/golang-lru/v2 v2.0.7
+	github.com/huhuapop/sector-counter v0.0.0-20211111185659-eab9c68cab4b // indirect
 	github.com/icza/backscanner v0.0.0-20210726202459-ac2ffc679f94
 	github.com/influxdata/influxdb1-client v0.0.0-20200827194710-b269163b24ab
 	github.com/invopop/jsonschema v0.12.0
@@ -356,6 +357,8 @@ require (
 	lukechampine.com/blake3 v1.3.0 // indirect
 	rsc.io/tmplfunc v0.0.3 // indirect
 )
+
+replace github.com/huhuapop/sector-counter => ./extern/sector-counter
 
 require (
 	github.com/pion/dtls/v3 v3.0.4 // indirect
